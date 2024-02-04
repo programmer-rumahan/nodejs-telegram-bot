@@ -9,6 +9,8 @@ var logger = require("morgan");
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 
+var telegramBot = require("./helpers/telegram-bot");
+
 var app = express();
 
 // view engine setup
@@ -23,6 +25,19 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
+app.post("/api/send-message", (req, res) => {
+  const { chatId, message } = req.body;
+  telegramBot
+    .sendMessage(chatId, message)
+    .then((response) => {
+      console.log({ response });
+      res.send(response);
+    })
+    .catch((err) => {
+      console.log({ err });
+      res.send(err);
+    });
+});
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
